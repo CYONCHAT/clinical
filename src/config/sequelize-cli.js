@@ -6,7 +6,7 @@ const base = {
   port: Number(process.env.DB_PORT || 5432),
   username: process.env.DB_USER || 'dbadmin',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'operaon_identity',
+  database: process.env.DB_NAME || 'operaon_clinical',
   logging: false,
 };
 
@@ -21,6 +21,9 @@ if (process.env.DATABASE_URL) {
 
 module.exports = {
   development: base,
-  test: { ...base, database: process.env.TEST_DB_NAME || 'operaon_identity_test' },
+  test: {
+    ...base,
+    database: process.env.TEST_DB_NAME || process.env.DB_NAME || 'operaon_clinical_test',
+  },
   production: { ...base },
 };
