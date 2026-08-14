@@ -1,5 +1,6 @@
 const request = require('supertest');
 const { randomUUID } = require('crypto');
+const jwt = require('jsonwebtoken');
 require('./env');
 const app = require('../src/app');
 const { generateAccessToken } = require('../src/utils/jwt');
@@ -38,6 +39,22 @@ describe('Clinical standalone contract', () => {
   test('rejects requests without service key or access token', async () => {
     const response = await request(app).get('/api/clinical/patients');
     expect(response.status).toBe(401);
+  });
+
+  test('rejects a token intended for another service audience', async () => {
+    const wrongAudienceToken = jwt.sign({
+      sub: userId,
+      tenantId,
+      tokenType: 'access',
+      permissions: ['clinical:read'],
+    }, process.env.JWT_SECRET, { issuer: process.env.JWT_ISSUER, audience: 'operaon-api', expiresIn: '10m' });
+    const response = await request(app).get('/api/clinical/patients').set(auth(wrongAudienceToken));
+    expect(response.status).toBe(401);
+  });
+
+  test('does not grant service tokens a universal permission bypass', async () => {
+    const response = await request(app).get('/api/clinical/patients').set(auth(tokenFor({ service: true, permissions: [] })));
+    expect(response.status).toBe(403);
   });
 
   test('creates and lists a patient inside the tenant', async () => {

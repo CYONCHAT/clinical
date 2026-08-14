@@ -1,16 +1,25 @@
+'use strict';
+
+const crypto = require('crypto');
 const env = require('../config/env');
 const { verifyAccessToken } = require('../utils/jwt');
 const { AuthenticationError, AuthorizationError } = require('../utils/errors');
 
 const getBearerToken = (header) => {
   if (!header || typeof header !== 'string') return null;
-  const [scheme, token] = header.split(' ');
+  const [scheme, token] = header.trim().split(/\s+/);
   return scheme?.toLowerCase() === 'bearer' && token ? token : null;
+};
+
+const sameSecret = (provided, expected) => {
+  const left = Buffer.from(String(provided || ''));
+  const right = Buffer.from(String(expected || ''));
+  return left.length === right.length && crypto.timingSafeEqual(left, right);
 };
 
 const authenticateServiceKey = (req) => {
   const provided = req.get('X-Service-Key');
-  if (!provided || provided !== env.serviceApiKey) throw new AuthenticationError('Credencial de serviço inválida', 'SERVICE_AUTH_INVALID');
+  if (!sameSecret(provided, env.serviceApiKey)) throw new AuthenticationError('Credencial de serviço inválida', 'SERVICE_AUTH_INVALID');
 };
 
 const authenticate = (req, _res, next) => {
@@ -42,7 +51,7 @@ const authenticate = (req, _res, next) => {
 
 const requirePermission = (resource, action) => (req, _res, next) => {
   const permissions = req.context?.permissions || [];
-  if (req.context?.isService || permissions.includes(`${resource}:${action}`) || permissions.includes('clinical:admin')) return next();
+  if (permissions.includes('*:*') || permissions.includes(`${resource}:${action}`) || permissions.includes('clinical:admin')) return next();
   return next(new AuthorizationError('Permissão insuficiente', 'PERMISSION_DENIED'));
 };
 

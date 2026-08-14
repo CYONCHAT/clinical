@@ -34,6 +34,10 @@ if (jwtAlgorithm === 'HS256' && isProduction && jwtSecret.length < 32) {
 }
 
 const normalizeKey = (value) => (value ? value.replace(/\\n/g, '\n') : undefined);
+const serviceApiKey = process.env.CLINICAL_SERVICE_API_KEY
+  || process.env.SERVICE_API_KEY
+  || (isTest ? 'clinical-test-service-key' : 'clinical-development-service-key');
+if (isProduction && !serviceApiKey) throw new Error('SERVICE_API_KEY é obrigatório em produção');
 
 module.exports = {
   nodeEnv,
@@ -43,14 +47,14 @@ module.exports = {
   port,
   trustProxyHops: Number(process.env.TRUST_PROXY_HOPS || 1),
   serviceName: process.env.SERVICE_NAME || 'operaon_clinical',
-  serviceApiKey: requiredInProduction('SERVICE_API_KEY', process.env.CLINICAL_SERVICE_API_KEY || (isTest ? 'clinical-test-service-key' : 'clinical-development-service-key')),
+  serviceApiKey,
   jwt: {
     algorithm: jwtAlgorithm,
     secret: jwtSecret,
     privateKey: normalizeKey(process.env.JWT_PRIVATE_KEY),
     publicKey: normalizeKey(process.env.JWT_PUBLIC_KEY),
-    issuer: process.env.JWT_ISSUER || 'operaon-clinical',
-    audience: parseList(process.env.JWT_AUDIENCE, ['operaon-api']),
+    issuer: process.env.JWT_ISSUER || 'operaon-identity',
+    audience: parseList(process.env.JWT_AUDIENCE, ['operaon-clinical']),
     accessTtl: process.env.JWT_ACCESS_EXPIRATION || '15m',
     refreshTtl: process.env.JWT_REFRESH_EXPIRATION || '7d',
   },
