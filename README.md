@@ -100,3 +100,8 @@ X-Tenant-Id: <tenant-uuid>
 ## Observabilidade
 
 O serviço utiliza logging estruturado, request id e readiness separado do health check. Eventos clínicos relevantes são gravados em `clinical_audit_events`, sem registrar senhas, tokens, chaves de serviço ou códigos de MFA. O banco do Clinical deve ser isolado do banco da API e acessado com usuário de menor privilégio.
+
+<!-- OPERAON-DOCUMENTATION-LINK -->
+## Documentação
+
+A documentação técnica padronizada está em [docs/INDEX.md](docs/INDEX.md). Ela inclui arquitetura, responsabilidades, segurança, contratos, operação, testes, runbooks e decisões.
