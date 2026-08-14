@@ -1,4 +1,15 @@
-# Operaon Clinical
+# Clinical / Patient Care
+
+> Serviço Clinical / Patient Care da Operaon para dados clínicos e cuidado do paciente.
+
+| Item | Referência |
+|---|---|
+| Documentação | [docs/INDEX.md](docs/INDEX.md) |
+| Segurança | [SECURITY.md](SECURITY.md) |
+| Contribuição | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Processo de release | [docs/release-process.md](docs/release-process.md) |
+
+---
 
 Standalone responsável pelo domínio **Clinical / Patient Care** da plataforma Operaon. O serviço concentra o prontuário clínico, avaliações, questionários, testes funcionais, mobilidade, sessões terapêuticas e pedidos de vínculo entre paciente e clínica.
 
